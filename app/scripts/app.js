@@ -23,19 +23,29 @@ angular
 	'satellizer'
   ])
 
-.run(['$rootScope', '$state', function($rootScope, $state){
+.run(['$rootScope', '$state', '$auth', function($rootScope, $state, $auth){
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-        var xx = toState;
-        var y = $rootScope;
-        var x = $state;
-      if (toState.authRequired) {
-        return $state.go('login');
+        var xtoState = toState;
+        var x$rootScope = $rootScope;
+        var x$state = $state;
+        var x$auth = $auth;
+        var xisAuthenticated = $auth.isAuthenticated()
+        var toStateuthRequired = toState.authRequired;
+        
+      if (toState.authRequired && !$auth.isAuthenticated()) {
+          event.preventDefault();
+          return $state.go('login');
       }
     });
     
 }])
 
-.config(function($stateProvider,$urlRouterProvider) {
+.config(function($stateProvider,$urlRouterProvider, $authProvider) {
+    $authProvider.tokenName = 'result';
+    $authProvider.loginUrl = 'http://vigilante.nvl.inf.br/painel/zabbix/api_jsonrpc.php';
+    $authProvider.httpInterceptor = false;
+    $authProvider.storageType = 'localStorage';    
+    
     $stateProvider
     .state({name: 'groups',
             authRequired: true,
@@ -55,8 +65,16 @@ angular
             template: '<h3>hello world! items</h3>'})
 	.state('/', {
       url: '/',
+      authRequired: true,  
       templateUrl: 'views/main.html'
     })
+    .state({
+        name:'login',
+        url: '/login',
+        templateUrl: 'views/login.html',
+        controller: 'LoginCtrl',
+        controllerAs: 'vm'
+      })
     
 	$urlRouterProvider.otherwise('/');   
     

@@ -8,6 +8,6 @@
  * Service in the zabbixRelatorioApp.
  */
 angular.module('zabbixRelatorioApp')
-  .service('user', function () {
+  .service('UserService', function () {
     // AngularJS will instantiate a singleton by calling "new" on this function
   });
